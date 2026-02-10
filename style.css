@@ -1,154 +1,71 @@
-/* Reset decente */
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
-}
-
-/* Variáveis pra facilitar upgrades */
-:root {
-  --bg: #0f1220;
-  --card: rgba(255, 255, 255, 0.08);
-  --accent: #ff9800;
-  --text: #ffffff;
-  --muted: #b3b3b3;
-  --radius: 14px;
+  font-family: Arial, sans-serif;
 }
 
 body {
+  background: linear-gradient(135deg, #141e30, #243b55);
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f1220, #1b1f3a);
-  font-family: "Segoe UI", Roboto, sans-serif;
-  color: var(--text);
   display: flex;
   justify-content: center;
   align-items: center;
+  color: #fff;
 }
 
-/* Container central */
-body > * {
-  max-width: 480px;
-  width: 100%;
+.app {
+  background: #1f2a44;
+  padding: 20px;
+  border-radius: 10px;
+  width: 360px;
 }
 
-/* Título */
 h1 {
   text-align: center;
-  margin-bottom: 20px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  margin-bottom: 15px;
 }
 
-/* Card do formulário */
 form {
-  background: var(--card);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius);
-  padding: 20px;
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  margin-bottom: 15px;
 }
 
-/* Inputs */
-input,
-select {
+input {
   flex: 1;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius);
-  padding: 10px;
-  color: var(--text);
-  outline: none;
-  transition: border 0.3s, box-shadow 0.3s;
-}
-
-input::placeholder {
-  color: var(--muted);
-}
-
-input:focus,
-select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.3);
-}
-
-/* Botão */
-button {
-  background: var(--accent);
-  color: #000;
+  padding: 8px;
+  border-radius: 5px;
   border: none;
-  border-radius: var(--radius);
-  padding: 10px 16px;
-  font-weight: 700;
+}
+
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  background: #00c853;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(255, 152, 0, 0.5);
-}
-
-button:active {
-  transform: translateY(0);
-  box-shadow: none;
-}
-
-/* Lista */
 ul {
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  padding: 0;
 }
 
-/* Item do filme */
 li {
-  background: var(--card);
-  backdrop-filter: blur(10px);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  background: #2e3c5d;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 8px;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  animation: fadeIn 0.3s ease;
-  border-left: 4px solid var(--accent);
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* Título do filme */
-li strong {
-  font-size: 16px;
-  font-weight: 600;
+li.done span {
+  text-decoration: line-through;
+  opacity: 0.6;
 }
 
-/* Avaliação */
-li span {
-  color: var(--accent);
-  font-size: 14px;
-}
-
-/* Animação */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Responsivo */
-@media (max-width: 500px) {
-  form {
-    flex-direction: column;
-  }
-
-  button {
-    width: 100%;
-  }
+li button {
+  background: #ff5252;
+  font-size: 12px;
 }

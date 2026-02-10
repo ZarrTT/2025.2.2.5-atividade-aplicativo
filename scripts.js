@@ -1,65 +1,88 @@
 let db;
 
-// Abrir / criar banco
-const request = indexedDB.open("FilmesDB", 1);
+const request = indexedDB.open("todoDB", 1);
 
-request.onupgradeneeded = (event) => {
-  db = event.target.result;
-  const store = db.createObjectStore("filmes", {
-    keyPath: "id",
-    autoIncrement: true
-  });
+/* ===== Criar DB ===== */
+request.onupgradeneeded = e => {
+  db = e.target.result;
+  db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
 };
 
-request.onsuccess = (event) => {
-  db = event.target.result;
-  listarFilmes();
+request.onsuccess = e => {
+  db = e.target.result;
+  renderTasks();
 };
 
-request.onerror = () => {
-  console.error("Erro ao abrir IndexedDB");
-};
-
-// Adicionar filme
-document.getElementById("formFilme").addEventListener("submit", (e) => {
+/* ===== Adicionar tarefa ===== */
+document.getElementById("task-form").addEventListener("submit", e => {
   e.preventDefault();
 
-  const titulo = document.getElementById("titulo").value;
-  const avaliacao = document.getElementById("avaliacao").value;
+  const text = document.getElementById("task-input").value;
 
-  const tx = db.transaction("filmes", "readwrite");
-  const store = tx.objectStore("filmes");
+  const transaction = db.transaction("tasks", "readwrite");
+  const store = transaction.objectStore("tasks");
 
-  store.add({ titulo, avaliacao });
+  store.add({
+    text,
+    done: false
+  });
 
-  tx.oncomplete = () => {
+  transaction.oncomplete = () => {
     e.target.reset();
-    listarFilmes();
+    renderTasks();
   };
 });
 
-// Listar filmes dinamicamente
-function listarFilmes() {
-  const lista = document.getElementById("listaFilmes");
-  lista.innerHTML = "";
+/* ===== Listar tarefas ===== */
+function renderTasks() {
+  const list = document.getElementById("task-list");
+  list.innerHTML = "";
 
-  const tx = db.transaction("filmes", "readonly");
-  const store = tx.objectStore("filmes");
+  const transaction = db.transaction("tasks", "readonly");
+  const store = transaction.objectStore("tasks");
 
-  store.openCursor().onsuccess = (event) => {
-    const cursor = event.target.result;
+  store.openCursor().onsuccess = e => {
+    const cursor = e.target.result;
     if (cursor) {
-      const filme = cursor.value;
+      const task = cursor.value;
 
-      const div = document.createElement("div");
-      div.className = "filme";
-      div.innerHTML = `
-        <h3>${filme.titulo}</h3>
-        <p>Avaliação: ${"⭐".repeat(filme.avaliacao)}</p>
+      const li = document.createElement("li");
+      if (task.done) li.classList.add("done");
+
+      li.innerHTML = `
+        <span>${task.text}</span>
+        <div>
+          <button onclick="toggleTask(${task.id})">✔</button>
+          <button onclick="deleteTask(${task.id})">✖</button>
+        </div>
       `;
 
-      lista.appendChild(div);
+      list.appendChild(li);
       cursor.continue();
     }
   };
+}
+
+/* ===== Marcar como concluída ===== */
+function toggleTask(id) {
+  const transaction = db.transaction("tasks", "readwrite");
+  const store = transaction.objectStore("tasks");
+
+  const req = store.get(id);
+  req.onsuccess = () => {
+    const task = req.result;
+    task.done = !task.done;
+    store.put(task);
+  };
+
+  transaction.oncomplete = renderTasks;
+}
+
+/* ===== Excluir tarefa ===== */
+function deleteTask(id) {
+  const transaction = db.transaction("tasks", "readwrite");
+  const store = transaction.objectStore("tasks");
+
+  store.delete(id);
+  transaction.oncomplete = renderTasks;
 }
