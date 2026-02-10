@@ -2,50 +2,69 @@ let db;
 
 const request = indexedDB.open("todoDB", 1);
 
-/* ===== Criar DB ===== */
-request.onupgradeneeded = e => {
+/* ===== CRIAÇÃO DO BANCO ===== */
+request.onupgradeneeded = (e) => {
   db = e.target.result;
-  db.createObjectStore("tasks", { keyPath: "id", autoIncrement: true });
+
+  if (!db.objectStoreNames.contains("tasks")) {
+    db.createObjectStore("tasks", {
+      keyPath: "id",
+      autoIncrement: true
+    });
+  }
 };
 
-request.onsuccess = e => {
+request.onsuccess = (e) => {
   db = e.target.result;
   renderTasks();
 };
 
-/* ===== Adicionar tarefa ===== */
-document.getElementById("task-form").addEventListener("submit", e => {
+request.onerror = () => {
+  console.error("Erro ao abrir IndexedDB");
+};
+
+/* ===== ADICIONAR TAREFA ===== */
+document.getElementById("task-form").addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const text = document.getElementById("task-input").value;
+  const input = document.getElementById("task-input");
+  const text = input.value.trim();
 
-  const transaction = db.transaction("tasks", "readwrite");
-  const store = transaction.objectStore("tasks");
+  if (!text) return;
+
+  const tx = db.transaction("tasks", "readwrite");
+  const store = tx.objectStore("tasks");
 
   store.add({
     text,
     done: false
   });
 
-  transaction.oncomplete = () => {
-    e.target.reset();
-    renderTasks();
+  tx.oncomplete = () => {
+    input.value = "";
+    renderTasks(); // 🔥 agora sim, depois de salvar
   };
 });
 
-/* ===== Listar tarefas ===== */
+/* ===== LISTAR TAREFAS ===== */
 function renderTasks() {
   const list = document.getElementById("task-list");
   list.innerHTML = "";
 
-  const transaction = db.transaction("tasks", "readonly");
-  const store = transaction.objectStore("tasks");
+  const tx = db.transaction("tasks", "readonly");
+  const store = tx.objectStore("tasks");
 
-  store.openCursor().onsuccess = e => {
-    const cursor = e.target.result;
-    if (cursor) {
-      const task = cursor.value;
+  const request = store.getAll();
 
+  request.onsuccess = () => {
+    const tasks = request.result;
+
+    if (tasks.length === 0) {
+      list.innerHTML = `<li style="opacity:.5;text-align:center;">Nenhuma tarefa ainda</li>`;
+      return;
+    }
+
+    tasks.forEach(task => {
       const li = document.createElement("li");
       if (task.done) li.classList.add("done");
 
@@ -58,31 +77,31 @@ function renderTasks() {
       `;
 
       list.appendChild(li);
-      cursor.continue();
-    }
+    });
   };
 }
 
-/* ===== Marcar como concluída ===== */
+/* ===== MARCAR COMO CONCLUÍDA ===== */
 function toggleTask(id) {
-  const transaction = db.transaction("tasks", "readwrite");
-  const store = transaction.objectStore("tasks");
+  const tx = db.transaction("tasks", "readwrite");
+  const store = tx.objectStore("tasks");
 
   const req = store.get(id);
+
   req.onsuccess = () => {
     const task = req.result;
     task.done = !task.done;
     store.put(task);
   };
 
-  transaction.oncomplete = renderTasks;
+  tx.oncomplete = renderTasks;
 }
 
-/* ===== Excluir tarefa ===== */
+/* ===== EXCLUIR ===== */
 function deleteTask(id) {
-  const transaction = db.transaction("tasks", "readwrite");
-  const store = transaction.objectStore("tasks");
+  const tx = db.transaction("tasks", "readwrite");
+  const store = tx.objectStore("tasks");
 
   store.delete(id);
-  transaction.oncomplete = renderTasks;
+  tx.oncomplete = renderTasks;
 }
