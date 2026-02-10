@@ -1,29 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>To-Do List</title>
+  <title>Lista de Tarefas</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <main class="app">
-    <h1>📝 To-Do List</h1>
+  <div class="card">
+    <h1>📝 Lista de Tarefas</h1>
 
     <form id="task-form">
-      <input
-        type="text"
-        id="task-input"
-        placeholder="Nova tarefa..."
-        required
-      >
+      <input type="text" id="task-input" placeholder="Digite uma tarefa" required>
       <button type="submit">Adicionar</button>
     </form>
 
     <ul id="task-list"></ul>
-  </main>
+  </div>
 
-  <!-- ⚠️ SCRIPT SEMPRE NO FINAL -->
   <script src="script.js"></script>
 </body>
 </html>
